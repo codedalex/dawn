@@ -41,31 +41,6 @@
     </div>
   {%- endif -%}
   
-  <style>
-    .nav-below-header {
-      width: 100%;
-      background: {{ settings.colors_background }};
-      border-top: 1px solid {{ settings.colors_border }};
-      border-bottom: 1px solid {{ settings.colors_border }};
-    }
-  
-    .box-navigation {
-      position: relative;
-    }
-  
-    .box-nav-ul {
-      list-style: none;
-      margin: 0;
-      padding: 0;
-    }
-  
-    @media screen and (max-width: 1199px) {
-      .tf-md-hidden {
-        display: none;
-      }
-    }
-  </style>
-  
   <script>
   class HeaderNavigation extends HTMLElement {
     constructor() {

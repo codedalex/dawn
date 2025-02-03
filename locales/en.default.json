@@ -20,6 +20,9 @@
     "navigation": {
       "menu": "Menu"
     },
+    "mobile_menu": {
+      "title": "Mobile Menu"
+    },
     "accessibility": {
       "skip_to_content": "Skip to content",
       "close": "Close",
@@ -40,6 +43,7 @@
       "share": "Share on"
     },
     "contact": {
+      "need_help": "Need Help?",
       "phone": "Phone",
       "email": "Email",
       "address": "Address",
@@ -56,6 +60,9 @@
     }
   },
   "customer": {
+    "login": {
+      "title": "Login"
+    },
     "account": {
       "title": "Account"
     },

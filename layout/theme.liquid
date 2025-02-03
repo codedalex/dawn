@@ -57,14 +57,6 @@
     <script src="{{ 'multiple-modal.js' | asset_url }}" defer></script>
     <script src="{{ 'main.js' | asset_url }}" defer></script>
   
-    <!-- Initialize preloader -->
-    <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        setTimeout(function() {
-          document.querySelector('.preload').classList.add('loaded');
-          document.body.classList.remove('preload-wrapper');
-        }, 500);
-      });
-    </script>
+
   </body>
   </html>
