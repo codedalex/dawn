@@ -1,0 +1,88 @@
+{% comment %}snippets/header-logo.liquid{% endcomment %}
+
+{%- liquid
+    assign logo_width = block.settings.logo_width | default: 140
+    assign logo_width_mobile = block.settings.logo_width_mobile | default: logo_width
+    assign logo_height = block.settings.logo_height | default: 50
+    assign logo_alignment = block.settings.logo_alignment | default: 'left'
+  -%}
+  
+  <div class="col-xl-3 col-md-4 col-6" {{ block.shopify_attributes }}>
+    <a href="{{ routes.root_url }}" 
+       class="logo-header"
+       style="justify-content: {{ logo_alignment }};"
+       {% if block.settings.home_page_only %}
+         aria-label="{{ shop.name }}"
+       {% endif %}>
+      
+      {%- if block.settings.logo != blank -%}
+        {%- assign logo_alt = block.settings.logo.alt | default: shop.name | escape -%}
+        {%- assign logo_height = block.settings.logo_height | default: block.settings.logo.height -%}
+        {%- assign logo_width = block.settings.logo_width | default: block.settings.logo.width -%}
+  
+        {{ block.settings.logo | image_url: width: logo_width | image_tag:
+          class: "logo main-logo",
+          widths: "50, 100, 150, 200, 250, 300, 400, 500",
+          height: logo_height,
+          width: logo_width,
+          alt: logo_alt,
+          loading: "eager"
+        }}
+  
+        {%- if block.settings.logo_mobile != blank -%}
+          {{ block.settings.logo_mobile | image_url: width: logo_width_mobile | image_tag:
+            class: "logo mobile-logo",
+            widths: "50, 100, 150, 200",
+            loading: "eager",
+            alt: logo_alt
+          }}
+        {%- endif -%}
+      {%- else -%}
+        <span class="h4 header__logo-text">{{ shop.name }}</span>
+      {%- endif -%}
+    </a>
+  </div>
+  
+  {% style %}
+    .logo-header {
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+      {% if block.settings.height_constraint != blank %}
+      height: {{ block.settings.height_constraint }}px;
+      {% endif %}
+    }
+  
+    .logo {
+      display: block;
+      max-width: {{ logo_width }}px;
+      width: 100%;
+      height: auto;
+      flex-shrink: 0;
+    }
+  
+    .mobile-logo {
+      display: none;
+    }
+  
+    .header__logo-text {
+      font-size: calc({{ settings.type_header_base_size }}px * 1.15);
+      color: {{ settings.colors_text }};
+    }
+  
+    @media screen and (max-width: 989px) {
+      .logo {
+        max-width: {{ logo_width_mobile }}px;
+      }
+      
+      {% if block.settings.logo_mobile != blank %}
+        .main-logo {
+          display: none;
+        }
+        
+        .mobile-logo {
+          display: block;
+        }
+      {% endif %}
+    }
+  {% endstyle %}

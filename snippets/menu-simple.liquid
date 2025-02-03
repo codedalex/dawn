@@ -1,0 +1,258 @@
+{% comment %}
+  Snippet: menu-simple.liquid
+  Usage: Renders a simple menu item with basic dropdown
+  Accepts:
+  - block: The menu block from header section
+{% endcomment %}
+
+{%- liquid
+    assign menu = linklists[block.settings.main_menu]
+    assign show_dropdown = true
+  -%}
+  
+  {% for link in menu.links %}
+    {%- liquid
+      assign has_dropdown = false
+      if link.links.size > 0 and show_dropdown
+        assign has_dropdown = true
+      endif
+    -%}
+  
+    <li class="menu-item {% if has_dropdown %}position-relative{% endif %}">
+      <a href="{{ link.url }}" 
+         class="item-link {% if link.current %}current{% endif %}"
+         {% if has_dropdown %}aria-expanded="false"{% endif %}>
+        {{ link.title }}
+        {%- if has_dropdown -%}
+          <i class="icon icon-arrow-down"></i>
+        {%- endif -%}
+      </a>
+  
+      {% if has_dropdown %}
+        <div class="sub-menu submenu-default">
+          <ul class="menu-list">
+            {% for child_link in link.links %}
+              {%- liquid
+                assign has_grandchildren = false
+                if child_link.links.size > 0 and show_dropdown
+                  assign has_grandchildren = true
+                endif
+              -%}
+  
+              <li {% if has_grandchildren %}class="menu-item-2"{% endif %}>
+                <a href="{{ child_link.url }}" 
+                   class="menu-link-text link text_black-2 {% if child_link.current %}current{% endif %}">
+                  {{ child_link.title }}
+                </a>
+  
+                {% if has_grandchildren %}
+                  <div class="sub-menu submenu-default">
+                    <ul class="menu-list">
+                      {% for grandchild_link in child_link.links %}
+                        <li>
+                          <a href="{{ grandchild_link.url }}" 
+                             class="menu-link-text link text_black-2 {% if grandchild_link.current %}current{% endif %}">
+                            {{ grandchild_link.title }}
+                          </a>
+                        </li>
+                      {% endfor %}
+                    </ul>
+                  </div>
+                {% endif %}
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
+    </li>
+  {% endfor %}
+  
+  <style>
+    .menu-item {
+      position: relative;
+    }
+  
+    .item-link {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 8px 0;
+      color: {{ block.settings.menu_text_color }};
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+  
+    .item-link:hover,
+    .item-link.current {
+      color: {{ block.settings.menu_hover_color }};
+    }
+  
+    .icon-arrow-down {
+      font-size: 12px;
+      transition: transform 0.3s ease;
+    }
+  
+    .menu-item:hover .icon-arrow-down {
+      transform: rotate(180deg);
+    }
+  
+    .sub-menu {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      min-width: {{ block.settings.dropdown_width }}px;
+      background: {{ block.settings.submenu_background }};
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+      z-index: 100;
+      padding: 15px 0;
+      border-radius: 4px;
+    }
+  
+    {% if block.settings.dropdown_alignment == 'center' %}
+      .sub-menu {
+        left: 50%;
+        transform: translateX(-50%);
+      }
+    {% elsif block.settings.dropdown_alignment == 'right' %}
+      .sub-menu {
+        left: auto;
+        right: 0;
+      }
+    {% endif %}
+  
+    .menu-item:hover > .sub-menu {
+      opacity: 1;
+      visibility: visible;
+    }
+  
+    .menu-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+  
+    .menu-link-text {
+      display: block;
+      padding: 8px 20px;
+      color: {{ block.settings.submenu_text_color }};
+      text-decoration: none;
+      transition: color 0.3s ease;
+      white-space: nowrap;
+    }
+  
+    .menu-link-text:hover,
+    .menu-link-text.current {
+      color: {{ block.settings.menu_hover_color }};
+      background: rgba(0,0,0,0.03);
+    }
+  
+    {% case block.settings.menu_item_style %}
+      {% when 'bordered' %}
+        .item-link {
+          border: 1px solid {{ block.settings.menu_text_color }};
+          padding: 8px 15px;
+          border-radius: 4px;
+        }
+        
+        .item-link:hover {
+          border-color: {{ block.settings.menu_hover_color }};
+        }
+      
+      {% when 'underline' %}
+        .item-link {
+          position: relative;
+        }
+        
+        .item-link:after {
+          content: '';
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          width: 0;
+          height: 2px;
+          background: {{ block.settings.menu_hover_color }};
+          transition: width 0.3s ease;
+        }
+        
+        .item-link:hover:after,
+        .item-link.current:after {
+          width: 100%;
+        }
+      
+      {% when 'button' %}
+        .item-link {
+          padding: 8px 20px;
+          background: {{ block.settings.menu_text_color }};
+          color: {{ block.settings.submenu_background }};
+          border-radius: 4px;
+        }
+        
+        .item-link:hover {
+          background: {{ block.settings.menu_hover_color }};
+        }
+    {% endcase %}
+  
+    .menu-item-2 {
+      position: relative;
+    }
+  
+    .menu-item-2 > .sub-menu {
+      top: 0;
+      left: 100%;
+      margin-left: 1px;
+    }
+  </style>
+  
+  <script>
+  class SimpleMenu extends HTMLElement {
+    constructor() {
+      super();
+      this.init();
+    }
+  
+    init() {
+      this.handleDropdowns();
+      this.handleKeyboard();
+    }
+  
+    handleDropdowns() {
+      const items = this.querySelectorAll('.menu-item');
+      items.forEach(item => {
+        const link = item.querySelector('.item-link');
+        const submenu = item.querySelector('.sub-menu');
+        
+        if (!link || !submenu) return;
+  
+        link.addEventListener('click', (e) => {
+          if (link.getAttribute('href') === '#') {
+            e.preventDefault();
+          }
+        });
+  
+        item.addEventListener('mouseenter', () => {
+          if (link) link.setAttribute('aria-expanded', 'true');
+        });
+  
+        item.addEventListener('mouseleave', () => {
+          if (link) link.setAttribute('aria-expanded', 'false');
+        });
+      });
+    }
+  
+    handleKeyboard() {
+      this.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          const expandedItems = this.querySelectorAll('[aria-expanded="true"]');
+          expandedItems.forEach(item => {
+            item.setAttribute('aria-expanded', 'false');
+          });
+        }
+      });
+    }
+  }
+  
+  customElements.define('simple-menu', SimpleMenu);
+  </script>

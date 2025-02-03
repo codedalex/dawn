@@ -1,0 +1,125 @@
+{% comment %}
+  Snippet: header-navigation.liquid
+  Usage: Renders the header navigation menus
+  Accepts:
+  - section: The section object containing navigation settings
+{% endcomment %}
+
+{%- if section.settings.nav_position == 'below' -%}
+    <div class="nav-below-header">
+  {%- endif -%}
+  
+  <div class="col-xl-6 tf-md-hidden">
+    <nav class="box-navigation text-{{ section.settings.nav_alignment }}">
+      <ul class="box-nav-ul d-flex align-items-center justify-content-{{ section.settings.nav_alignment }} gap-30">
+        {% for block in section.blocks %}
+          {% case block.type %}
+            {% when 'menu_simple' %}
+              {% render 'menu-simple', block: block %}
+            
+            {% when 'menu_mega' %}
+              {% render 'menu-mega', block: block %}
+            
+            {% when 'menu_dropdown' %}
+              {% render 'menu-dropdown', block: block %}
+            
+            {% when 'menu_featured' %}
+              {% render 'menu-featured', block: block %}
+            
+            {% when 'menu_image' %}
+              {% render 'menu-image', block: block %}
+            
+            {% when 'menu_products' %}
+              {% render 'menu-products', block: block %}
+          {% endcase %}
+        {% endfor %}
+      </ul>
+    </nav>
+  </div>
+  
+  {%- if section.settings.nav_position == 'below' -%}
+    </div>
+  {%- endif -%}
+  
+  <style>
+    .nav-below-header {
+      width: 100%;
+      background: {{ settings.colors_background }};
+      border-top: 1px solid {{ settings.colors_border }};
+      border-bottom: 1px solid {{ settings.colors_border }};
+    }
+  
+    .box-navigation {
+      position: relative;
+    }
+  
+    .box-nav-ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+  
+    @media screen and (max-width: 1199px) {
+      .tf-md-hidden {
+        display: none;
+      }
+    }
+  </style>
+  
+  <script>
+  class HeaderNavigation extends HTMLElement {
+    constructor() {
+      super();
+      this.init();
+    }
+  
+    init() {
+      // Handle mega menus
+      this.handleMegaMenus();
+      
+      // Handle dropdowns
+      this.handleDropdowns();
+      
+      // Handle mobile behavior
+      this.handleMobile();
+    }
+  
+    handleMegaMenus() {
+      const megaMenus = this.querySelectorAll('.mega-menu');
+      megaMenus.forEach(menu => {
+        const parent = menu.closest('.menu-item');
+        if (!parent) return;
+  
+        parent.addEventListener('mouseenter', () => {
+          menu.classList.add('active');
+        });
+  
+        parent.addEventListener('mouseleave', () => {
+          menu.classList.remove('active');
+        });
+      });
+    }
+  
+    handleDropdowns() {
+      const dropdowns = this.querySelectorAll('.submenu-default');
+      dropdowns.forEach(dropdown => {
+        const parent = dropdown.closest('.menu-item');
+        if (!parent) return;
+  
+        parent.addEventListener('mouseenter', () => {
+          dropdown.classList.add('active');
+        });
+  
+        parent.addEventListener('mouseleave', () => {
+          dropdown.classList.remove('active');
+        });
+      });
+    }
+  
+    handleMobile() {
+      // Add mobile-specific handling if needed
+    }
+  }
+  
+  customElements.define('header-navigation', HeaderNavigation);
+  </script>

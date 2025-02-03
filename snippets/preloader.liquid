@@ -1,0 +1,94 @@
+{% comment %}
+  Renders the site preloader
+  Usage:
+  {% render 'preloader' %}
+{% endcomment %}
+
+{% if settings.enable_preloader %}
+    <div class="preload preload-container">
+      <div class="preload-logo">
+        {% if settings.preloader_logo != blank %}
+          {{ settings.preloader_logo | image_url: width: 150 | image_tag: loading: 'eager' }}
+        {% endif %}
+        <div class="spinner"></div>
+      </div>
+    </div>
+  
+    <style>
+      .preload {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: #fff;
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+      }
+  
+      .preload.loaded {
+        opacity: 0;
+        visibility: hidden;
+      }
+  
+      .preload-logo {
+        text-align: center;
+      }
+  
+      .preload-logo img {
+        max-width: 150px;
+        height: auto;
+        margin-bottom: 20px;
+      }
+  
+      .spinner {
+        width: 40px;
+        height: 40px;
+        margin: 0 auto;
+        border: 3px solid #f3f3f3;
+        border-top: 3px solid {{ settings.accent_color | default: '#000' }};
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+  
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+  
+      .preload-wrapper {
+        overflow: hidden;
+      }
+    </style>
+  
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const preloader = document.querySelector('.preload');
+        const duration = {{ settings.preloader_duration | default: 1000 }};
+        
+        if (preloader) {
+          // Show preloader
+          document.body.classList.add('preload-wrapper');
+          
+          // Handle page load
+          window.addEventListener('load', function() {
+            setTimeout(function() {
+              preloader.classList.add('loaded');
+              document.body.classList.remove('preload-wrapper');
+            }, duration);
+          });
+  
+          // Fallback if load event doesn't fire
+          setTimeout(function() {
+            if (!preloader.classList.contains('loaded')) {
+              preloader.classList.add('loaded');
+              document.body.classList.remove('preload-wrapper');
+            }
+          }, duration + 1000);
+        }
+      });
+    </script>
+  {% endif %}

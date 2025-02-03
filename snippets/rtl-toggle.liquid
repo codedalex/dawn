@@ -1,0 +1,76 @@
+{% comment %}
+  Renders the RTL toggle button
+  Usage:
+  {% render 'rtl-toggle' %}
+{% endcomment %}
+
+{% if settings.enable_rtl_toggle %}
+    <a href="javascript:void(0);" 
+       id="toggle-rtl" 
+       class="tf-btn animate-hover-btn btn-fill"
+       aria-label="{{ 'general.rtl.toggle_direction' | t }}"
+       data-direction="ltr">
+      RTL
+    </a>
+  
+    <style>
+      #toggle-rtl {
+        position: fixed;
+        top: 50%;
+        right: 0;
+        transform: translateY(-50%);
+        z-index: 999;
+        padding: 10px 15px;
+        border-radius: 4px 0 0 4px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+      }
+  
+      .rtl {
+        direction: rtl;
+        text-align: right;
+      }
+  
+      .rtl #toggle-rtl {
+        right: auto;
+        left: 0;
+        border-radius: 0 4px 4px 0;
+      }
+  
+      @media screen and (max-width: 767px) {
+        #toggle-rtl {
+          display: none;
+        }
+      }
+    </style>
+  
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const rtlToggle = document.getElementById('toggle-rtl');
+        const htmlElement = document.documentElement;
+        
+        // Check for stored preference
+        const storedDirection = localStorage.getItem('textDirection');
+        if (storedDirection === 'rtl') {
+          htmlElement.classList.add('rtl');
+          rtlToggle.textContent = 'LTR';
+          rtlToggle.dataset.direction = 'rtl';
+        }
+  
+        rtlToggle.addEventListener('click', function() {
+          const currentDirection = this.dataset.direction;
+          if (currentDirection === 'ltr') {
+            htmlElement.classList.add('rtl');
+            this.textContent = 'LTR';
+            this.dataset.direction = 'rtl';
+            localStorage.setItem('textDirection', 'rtl');
+          } else {
+            htmlElement.classList.remove('rtl');
+            this.textContent = 'RTL';
+            this.dataset.direction = 'ltr';
+            localStorage.setItem('textDirection', 'ltr');
+          }
+        });
+      });
+    </script>
+  {% endif %}

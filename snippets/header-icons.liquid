@@ -1,0 +1,129 @@
+{% comment %}
+  Snippet: header-icons.liquid
+  Usage: Renders the header icons (search, account, wishlist, cart)
+  Accepts:
+  - section: The section object containing icon settings
+  - block: The block object containing icon settings
+{% endcomment %}
+
+<div class="col-xl-3 col-md-4 col-3 header-icons-wrapper">
+    {% if block.settings.show_icons %}
+      <ul class="nav-icon d-flex justify-content-end align-items-center gap-20 w-100">
+        <li class="nav-search">
+          <a href="#canvasSearch" 
+             data-bs-toggle="offcanvas" 
+             aria-controls="offcanvasLeft" 
+             class="nav-icon-item"
+             aria-label="{{ 'general.search.title' | t }}">
+            <i class="icon icon-search"></i>
+          </a>
+        </li>
+
+        <li class="nav-account">
+          {% if shop.customer_accounts_enabled %}
+            <a href="{% if customer %}{{ routes.account_url }}{% else %}#login{% endif %}" 
+               {% unless customer %}data-bs-toggle="modal"{% endunless %} 
+               class="nav-icon-item"
+               aria-label="{{ 'customer.account.title' | t }}">
+              <i class="icon icon-account"></i>
+            </a>
+          {% endif %}
+        </li>
+
+        <li class="nav-wishlist">
+          <a href="wishlist.html" 
+             class="nav-icon-item"
+             aria-label="{{ 'general.wishlist.title' | t }}">
+            <i class="icon icon-heart"></i>
+            <span class="count-box text-black">0</span>
+          </a>
+        </li>
+
+        <li class="nav-cart">
+          <a href="#shoppingCart" 
+             data-bs-toggle="modal" 
+             class="nav-icon-item"
+             aria-label="{{ 'general.cart.title' | t }}">
+            <i class="icon icon-bag"></i>
+            <span class="count-box text-black">{{ cart.item_count }}</span>
+          </a>
+        </li>
+      </ul>
+    {% endif %}
+</div>
+  
+<style>
+  .header-icons-wrapper {
+    display: flex;
+    justify-content: flex-end;
+    margin-left: auto;
+  }
+
+  .nav-icon {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    justify-content: flex-end;
+  }
+
+  .nav-icon-item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: {{ settings.colors_text }};
+    text-decoration: none;
+    transition: color 0.3s ease;
+  }
+
+  .nav-icon-item:hover {
+    color: {{ settings.colors_accent_1 }};
+  }
+
+  .count-box {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: 9px;
+    background: {{ settings.colors_accent_1 }};
+    color: {{ settings.colors_solid_button_labels }};
+    font-size: 11px;
+    line-height: 18px;
+    text-align: center;
+  }
+
+  @media screen and (max-width: 989px) {
+    .nav-icon-item {
+      font-size: 20px;
+    }
+    
+    .count-box {
+      min-width: 16px;
+      height: 16px;
+      line-height: 16px;
+      font-size: 10px;
+    }
+  }
+</style>
+
+<script>
+  class HeaderIcons extends HTMLElement {
+    constructor() {
+      super();
+      this.cartCount = this.querySelector('.nav-cart .count-box');
+      this.bindEvents();
+    }
+
+    bindEvents() {
+      document.addEventListener('cart:updated', (event) => {
+        if (this.cartCount) {
+          this.cartCount.textContent = event.detail.cart.item_count;
+        }
+      });
+    }
+  }
+  customElements.define('header-icons', HeaderIcons);
+</script>
